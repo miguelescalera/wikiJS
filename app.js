@@ -2,7 +2,6 @@ const express = require('express');
 const nunjucks = require('nunjucks');
 const morgan = require('morgan');
 const sequelize = require('./db')   
-const {User, Page} = require('./models');
 const path = require("path")
 const app = express();
 

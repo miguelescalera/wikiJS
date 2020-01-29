@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {Page} = require("../models/index")
+const {Page, User} = require("../models/index")
 
 
  
@@ -16,26 +16,41 @@ router.get('/wiki/add', (req, res) =>{
 })
 
 router.post('/wiki/add', (req, res) =>{
-    const {title,content}=req.body
-    Page.create({title,content,urltitle:generateurltitle(title),status:"active"})
-    .then((page)=>{
-        console.log("se creo una pagina");
-        res.json(page)    
+    const {title,content,email}=req.body
+    User.findOne({where: {email}})
+    .then((user)=>{
+        if(user){
+            Page.create({title,content,urltitle:generateurltitle(title),status:"active", authorId:user.id})
+            .then((page)=>{
+                console.log("se creo una pagina");
+                res.json(page)    
+            })
+            .catch((err)=>{
+                console.log(err)
+            })
+        }else{
+            res.redirect('/user/signup')
+        }
     })
-    .catch((err)=>{
-        console.log(err)
-    })
+    
     
 })
 router.get("/wiki/page/:name",(req , res)=>{
     const name = req.params.name
-    Page.findAll({
+    Page.findOne({
         where:{
             urltitle:name,
-        }
+        },
+        include:[
+        {model: User, as: 'author'}
+        ]
     })
     .then((page)=>{
-        res.json(page)
+        if(page === null){
+            res.status(404).redirect('/wiki');
+        }else{
+            res.render('wikipage', {page})
+        }
     })
 })
 

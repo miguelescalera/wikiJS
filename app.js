@@ -2,8 +2,7 @@ const express = require('express');
 const nunjucks = require('nunjucks');
 const morgan = require('morgan');
 const sequelize = require('./db')   
-const models = require('./models');
-const routes = require('./routes')
+const {User, Page} = require('./models');
 const path = require("path")
 const app = express();
 
@@ -18,17 +17,13 @@ app.get("/",function(req,res,next){
   res.redirect("/")
 })
 
-app.use('/', routes);
+app.use(require('./routes/index'));
+app.use(require('./routes/wiki'));
+app.use(require('./routes/users'));
 
 app.use(express.static(path.join(__dirname, '/public')))
 
-models.User.sync({})
-    .then(()=>{
-        return models.Page.sync({})
-    })
-    .then(()=>{
-        return sequelize.sync()
-    })
+sequelize.sync({force: false})
     .then(() => {
     console.log('Conectado a la base de datos');
     app.listen(3000);

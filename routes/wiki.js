@@ -2,10 +2,13 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/', (req, res) =>{
-    res.send('WIKI')
+    res.render("index")
 })
 
-router.post('/', (req, res) =>{
+router.post('/wiki/add', (req, res) =>{
+    const {title,urltitle,content}=req.body
+    console.log(title,urltitle,content)
+    console.log(req.body)
     res.send('POST')
 })
 
